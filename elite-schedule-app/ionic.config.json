@@ -1,0 +1,7 @@
+{
+  "name": "elite-schedule-app",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
