@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ModalController, NavController} from '@ionic/angular';
 import {PlacesService} from '../../places.service';
 import {CreateBookingComponent} from '../../../bookings/create-booking/create-booking.component';
+import {Place} from '../../place.model';
 
 @Component({
   selector: 'app-place-detail',
@@ -10,15 +11,27 @@ import {CreateBookingComponent} from '../../../bookings/create-booking/create-bo
   styleUrls: ['./place-detail.page.scss'],
 })
 export class PlaceDetailPage implements OnInit {
+  place: Place;
 
   constructor(
       private navCtrl: NavController,
       private route: ActivatedRoute,
       private placesService: PlacesService,
       private modalCtrl: ModalController
-  ) {}
+  ) {
+  }
 
-  ngOnInit() {}
+  ngOnInit() {
+    // this.route.paramMap.subscribe(paramMap => {
+    //   if (!paramMap.has('placeId')) {
+    //     this.navCtrl.navigateBack('/places/tabs/offers');
+    //     return;
+    //   }
+    //   this.place = this.placesService.getPlace(paramMap.get('placeId'));
+    // });
+    const placeId = this.route.snapshot.paramMap.get('placeId');
+    this.place = this.placesService.getPlace(placeId);
+  }
 
   onBookPlace() {
     // this.router.navigateByUrl('/places/tabs/discover');
@@ -27,9 +40,17 @@ export class PlaceDetailPage implements OnInit {
     this.modalCtrl
         .create({
           component: CreateBookingComponent,
+          componentProps: { selectedPlace: this.place }
         })
         .then(modalEl => {
           modalEl.present();
+          return modalEl.onDidDismiss();
+        })
+        .then(resultData => {
+          console.log(resultData.data, resultData.role);
+          if (resultData.role === 'confirm') {
+            console.log('BOOKED!');
+          }
         });
   }
 
