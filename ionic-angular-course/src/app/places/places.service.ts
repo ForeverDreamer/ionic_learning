@@ -72,9 +72,13 @@ export class PlacesService {
         dateTo,
         this.authService.userId
     );
-    this.places.pipe(take(1)).subscribe(places => {
+    return this.places.pipe(
+        take(1),
+        delay(1000),
+        tap(places => {
           this._places.next(places.concat(newPlace));
-        });
+        })
+    );
   }
 
 }

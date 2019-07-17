@@ -11,7 +11,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './edit-offer.page.html',
   styleUrls: ['./edit-offer.page.scss'],
 })
-export class EditOfferPage implements OnInit, OnDestroy  {
+export class EditOfferPage implements OnInit, OnDestroy {
 
   place: Place;
   form: FormGroup;
