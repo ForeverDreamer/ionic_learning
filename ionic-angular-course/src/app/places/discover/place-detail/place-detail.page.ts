@@ -1,38 +1,52 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ActionSheetController, ModalController, NavController} from '@ionic/angular';
+import {Subscription} from 'rxjs';
+
 import {PlacesService} from '../../places.service';
 import {CreateBookingComponent} from '../../../bookings/create-booking/create-booking.component';
 import {Place} from '../../place.model';
 
+
 @Component({
-  selector: 'app-place-detail',
-  templateUrl: './place-detail.page.html',
-  styleUrls: ['./place-detail.page.scss'],
+    selector: 'app-place-detail',
+    templateUrl: './place-detail.page.html',
+    styleUrls: ['./place-detail.page.scss'],
 })
-export class PlaceDetailPage implements OnInit {
-  place: Place;
+export class PlaceDetailPage implements OnInit, OnDestroy {
+    place: Place;
+    private placeSub: Subscription;
 
-  constructor(
-      private navCtrl: NavController,
-      private route: ActivatedRoute,
-      private placesService: PlacesService,
-      private modalCtrl: ModalController,
-      private actionSheetCtrl: ActionSheetController
-  ) {
-  }
+    constructor(
+        private navCtrl: NavController,
+        private route: ActivatedRoute,
+        private placesService: PlacesService,
+        private modalCtrl: ModalController,
+        private actionSheetCtrl: ActionSheetController
+    ) {
+    }
 
-  ngOnInit() {
-    // this.route.paramMap.subscribe(paramMap => {
-    //   if (!paramMap.has('placeId')) {
-    //     this.navCtrl.navigateBack('/places/tabs/offers');
-    //     return;
-    //   }
-    //   this.place = this.placesService.getPlace(paramMap.get('placeId'));
-    // });
-    const placeId = this.route.snapshot.paramMap.get('placeId');
-    this.place = this.placesService.getPlace(placeId);
-  }
+    ngOnInit() {
+        // this.route.paramMap.subscribe(paramMap => {
+        //   if (!paramMap.has('placeId')) {
+        //     this.navCtrl.navigateBack('/places/tabs/offers');
+        //     return;
+        //   }
+        //   this.place = this.placesService.getPlace(paramMap.get('placeId'));
+        // });
+        const placeId = this.route.snapshot.paramMap.get('placeId');
+        this.placeSub = this.placesService
+            .getPlace(placeId)
+            .subscribe(place => {
+                this.place = place;
+            });
+    }
+
+    ngOnDestroy() {
+        if (this.placeSub) {
+            this.placeSub.unsubscribe();
+        }
+    }
 
     onBookPlace() {
         // this.router.navigateByUrl('/places/tabs/discover');
@@ -70,7 +84,7 @@ export class PlaceDetailPage implements OnInit {
         this.modalCtrl
             .create({
                 component: CreateBookingComponent,
-                componentProps: { selectedPlace: this.place, selectedMode: mode }
+                componentProps: {selectedPlace: this.place, selectedMode: mode}
             })
             .then(modalEl => {
                 modalEl.present();
