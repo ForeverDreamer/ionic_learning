@@ -7,6 +7,7 @@ import {PlacesService} from '../../places.service';
 import {CreateBookingComponent} from '../../../bookings/create-booking/create-booking.component';
 import {Place} from '../../place.model';
 import {BookingService} from '../../../bookings/booking.service';
+import {AuthService} from '../../../auth/auth.service';
 
 
 @Component({
@@ -16,6 +17,7 @@ import {BookingService} from '../../../bookings/booking.service';
 })
 export class PlaceDetailPage implements OnInit, OnDestroy {
     place: Place;
+    isBookable = false;
     private placeSub: Subscription;
 
     constructor(
@@ -25,7 +27,8 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         private modalCtrl: ModalController,
         private actionSheetCtrl: ActionSheetController,
         private bookingService: BookingService,
-        private loadingCtrl: LoadingController
+        private loadingCtrl: LoadingController,
+        private authService: AuthService
     ) {
     }
 
@@ -42,6 +45,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
             .getPlace(placeId)
             .subscribe(place => {
                 this.place = place;
+                this.isBookable = place.userId !== this.authService.userId;
             });
     }
 
