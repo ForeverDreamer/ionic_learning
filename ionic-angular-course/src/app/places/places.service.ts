@@ -63,9 +63,9 @@ export class PlacesService {
     }
 
     addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date) {
-        let generatedId: string;
+        // let newPlace: string;
         const newPlace = new Place(
-            Math.random().toString(),
+            null,
             title,
             description,
             'https://lonelyplanetimages.imgix.net/mastheads/GettyImages-538096543_medium.jpg?sharp=10&vib=20&w=1200',
@@ -74,22 +74,32 @@ export class PlacesService {
             dateTo,
             this.authService.userId
         );
+        // let newPlace = {
+        //     id: null,
+        //     userId: this.authService.userId,
+        //     title: title,
+        //     description: description,
+        //     imageUrl: 'https://lonelyplanetimages.imgix.net/mastheads/GettyImages-538096543_medium.jpg?sharp=10&vib=20&w=1200',
+        //     price: price,
+        //     availableFrom: dateFrom.toISOString().slice(0, 10),
+        //     availableTo: dateTo.toISOString().slice(0, 10)
+        // };
         return this.http
-            .post<{ name: string }>(
-                'https://ionic-angular-course.firebaseio.com/offered-places.json',
+            .post<{ place: Place }>(
+                'http://127.0.0.1:8000/video/places/',
                 {
                     ...newPlace,
-                    id: null
+                    // id: null
                 }
             )
             .pipe(
-                switchMap(resData => {
-                    generatedId = resData.name;
+                switchMap(place => {
+                    console.log(place);
                     return this.places;
                 }),
                 take(1),
                 tap(places => {
-                    newPlace.id = generatedId;
+                    // newPlace.id = generatedId;
                     this._places.next(places.concat(newPlace));
                 })
             );
