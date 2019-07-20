@@ -96,12 +96,18 @@ export class BookingService {
     }
 
     cancelBooking(bookingId: string) {
-        return this.bookings.pipe(
-            take(1),
-            delay(1000),
-            tap(bookings => {
-                this._bookings.next(bookings.filter(b => b.id !== bookingId));
-            })
-        );
+        return this.http
+            .delete(
+                `http://127.0.0.1:8000/video/bookings/${bookingId}`
+            )
+            .pipe(
+                switchMap(() => {
+                    return this.bookings;
+                }),
+                take(1),
+                tap(bookings => {
+                    this._bookings.next(bookings.filter(b => b.id !== bookingId));
+                })
+            );
     }
 }
