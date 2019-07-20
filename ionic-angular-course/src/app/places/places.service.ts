@@ -90,7 +90,8 @@ export class PlacesService {
         return this.places.pipe(
             take(1),
             map(places => {
-                return {...places.find(p => p.id === id)};
+                // tslint:disable-next-line:triple-equals
+                return {...places.find(p => p.id == id)};
             })
         );
     }
@@ -139,12 +140,13 @@ export class PlacesService {
     }
 
     updatePlace(placeId: string, title: string, description: string) {
+        let updatedPlaces: Place[];
         return this.places.pipe(
             take(1),
-            delay(1000),
-            tap(places => {
-                const updatedPlaceIndex = places.findIndex(pl => pl.id === placeId);
-                const updatedPlaces = [...places];
+            switchMap(places => {
+                // tslint:disable-next-line:triple-equals
+                const updatedPlaceIndex = places.findIndex(pl => pl.id == placeId);
+                updatedPlaces = [...places];
                 const oldPlace = updatedPlaces[updatedPlaceIndex];
                 updatedPlaces[updatedPlaceIndex] = new Place(
                     oldPlace.id,
@@ -156,6 +158,13 @@ export class PlacesService {
                     oldPlace.availableTo,
                     oldPlace.userId
                 );
+                return this.http.put(
+                    `http://127.0.0.1:8000/video/places/${placeId}/`,
+                    { ...updatedPlaces[updatedPlaceIndex], id: null }
+                );
+            }),
+            tap(resData => {
+                console.log(resData);
                 this._places.next(updatedPlaces);
             })
         );
