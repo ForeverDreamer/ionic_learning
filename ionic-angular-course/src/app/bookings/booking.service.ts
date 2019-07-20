@@ -3,7 +3,7 @@ import {BehaviorSubject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 
 import {Booking} from './booking.model';
-import {delay, switchMap, take} from 'rxjs/operators';
+import {delay, map, switchMap, take} from 'rxjs/operators';
 import {tap} from 'rxjs/internal/operators/tap';
 import {AuthService} from '../auth/auth.service';
 
@@ -57,6 +57,40 @@ export class BookingService {
                 tap(bookings => {
                     newBooking.id = generatedId;
                     this._bookings.next(bookings.concat(newBooking));
+                })
+            );
+    }
+
+    fetchBookings() {
+        return this.http
+            .get<{ [key: string]: Booking }>(
+                `http://127.0.0.1:8000/video/bookings/`
+            )
+            .pipe(
+                map(bookingData => {
+                    const bookings = [];
+                    for (const key in bookingData) {
+                        if (bookingData.hasOwnProperty(key)) {
+                            bookings.push(
+                                new Booking(
+                                    bookingData[key].id,
+                                    bookingData[key].placeId,
+                                    bookingData[key].userId,
+                                    bookingData[key].placeTitle,
+                                    bookingData[key].placeImage,
+                                    bookingData[key].firstName,
+                                    bookingData[key].lastName,
+                                    bookingData[key].guestNumber,
+                                    new Date(bookingData[key].bookedFrom),
+                                    new Date(bookingData[key].bookedTo)
+                                )
+                            );
+                        }
+                    }
+                    return bookings;
+                }),
+                tap(bookings => {
+                    this._bookings.next(bookings);
                 })
             );
     }
