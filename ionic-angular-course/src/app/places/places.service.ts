@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {delay, map, take} from 'rxjs/operators';
 import {tap} from 'rxjs/internal/operators/tap';
@@ -87,13 +87,24 @@ export class PlacesService {
     }
 
     getPlace(id: string) {
-        return this.places.pipe(
-            take(1),
-            map(places => {
-                // tslint:disable-next-line:triple-equals
-                return {...places.find(p => p.id == id)};
-            })
-        );
+        return this.http
+            .get<Place>(
+                `http://127.0.0.1:8000/video/places/${id}/`
+            )
+            .pipe(
+                map(placeData => {
+                    return new Place(
+                        id,
+                        placeData.title,
+                        placeData.description,
+                        placeData.imageUrl,
+                        placeData.price,
+                        new Date(placeData.availableFrom),
+                        new Date(placeData.availableTo),
+                        placeData.userId
+                    );
+                })
+            );
     }
 
     addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date) {
@@ -143,6 +154,13 @@ export class PlacesService {
         let updatedPlaces: Place[];
         return this.places.pipe(
             take(1),
+            switchMap(places => {
+                if (!places || places.length <= 0) {
+                    return this.fetchPlaces();
+                } else {
+                    return of(places);
+                }
+            }),
             switchMap(places => {
                 // tslint:disable-next-line:triple-equals
                 const updatedPlaceIndex = places.findIndex(pl => pl.id == placeId);
