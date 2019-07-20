@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 import {Booking} from './booking.model';
-import {delay, take} from 'rxjs/operators';
+import {delay, switchMap, take} from 'rxjs/operators';
 import {tap} from 'rxjs/internal/operators/tap';
 import {AuthService} from '../auth/auth.service';
+
 
 
 @Injectable({providedIn: 'root'})
@@ -15,7 +17,7 @@ export class BookingService {
         return this._bookings.asObservable();
     }
 
-    constructor(private authService: AuthService) {
+    constructor(private authService: AuthService, private http: HttpClient) {
     }
 
     addBooking(
@@ -28,8 +30,9 @@ export class BookingService {
         dateFrom: Date,
         dateTo: Date
     ) {
+        let generatedId: string;
         const newBooking = new Booking(
-            Math.random().toString(),
+            null,
             placeId,
             this.authService.userId,
             placeTitle,
@@ -40,13 +43,22 @@ export class BookingService {
             dateFrom,
             dateTo
         );
-        return this.bookings.pipe(
-            take(1),
-            delay(1000),
-            tap(bookings => {
-                this._bookings.next(bookings.concat(newBooking));
-            })
-        );
+        return this.http
+            .post<Booking>(
+                'http://127.0.0.1:8000/video/bookings/',
+                { ...newBooking}
+            )
+            .pipe(
+                switchMap(booking => {
+                    generatedId = booking.id;
+                    return this.bookings;
+                }),
+                take(1),
+                tap(bookings => {
+                    newBooking.id = generatedId;
+                    this._bookings.next(bookings.concat(newBooking));
+                })
+            );
     }
 
     cancelBooking(bookingId: string) {

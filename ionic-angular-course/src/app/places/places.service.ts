@@ -130,7 +130,7 @@ export class PlacesService {
         //     availableTo: dateTo.toISOString().slice(0, 10)
         // };
         return this.http
-            .post<{ place: Place }>(
+            .post<Place>(
                 'http://127.0.0.1:8000/video/places/',
                 {
                     ...newPlace,
