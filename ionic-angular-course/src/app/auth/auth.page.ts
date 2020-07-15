@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 
 import { AuthService } from './auth.service';
-import {NgForm} from '@angular/forms';
+import { NgForm } from '@angular/forms';
 
 
 @Component({

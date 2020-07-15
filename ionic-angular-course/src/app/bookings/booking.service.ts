@@ -12,6 +12,8 @@ import {AuthService} from '../auth/auth.service';
 @Injectable({providedIn: 'root'})
 export class BookingService {
     private _bookings = new BehaviorSubject<Booking[]>([]);
+    // private serverIp = '13.52.101.191:8000';
+    private serverIp = '127.0.0.1:8000';
 
     get bookings() {
         return this._bookings.asObservable();
@@ -45,7 +47,7 @@ export class BookingService {
         );
         return this.http
             .post<Booking>(
-                'http://127.0.0.1:8000/video/bookings/',
+                'http://' + this.serverIp + '/video/bookings/',
                 { ...newBooking}
             )
             .pipe(
@@ -64,7 +66,7 @@ export class BookingService {
     fetchBookings() {
         return this.http
             .get<{ [key: string]: Booking }>(
-                `http://127.0.0.1:8000/video/bookings/`
+                'http://' + this.serverIp + '/video/bookings/'
             )
             .pipe(
                 map(bookingData => {
@@ -98,7 +100,7 @@ export class BookingService {
     cancelBooking(bookingId: string) {
         return this.http
             .delete(
-                `http://127.0.0.1:8000/video/bookings/${bookingId}`
+                'http://' + this.serverIp + `/video/bookings/${bookingId}`
             )
             .pipe(
                 switchMap(() => {

@@ -1,0 +1,7 @@
+{
+  "appId": "com.doer.drfplaces",
+  "appName": "drf_places",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}

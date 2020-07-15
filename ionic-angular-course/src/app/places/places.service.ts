@@ -44,7 +44,10 @@ import {switchMap} from 'rxjs/internal/operators/switchMap';
     providedIn: 'root'
 })
 export class PlacesService {
+    // tslint:disable-next-line:variable-name
     private _places = new BehaviorSubject<Place[]>([]);
+    // private serverIp = '13.52.101.191:8000';
+    private serverIp = '127.0.0.1:8000';
 
     constructor(private authService: AuthService, private http: HttpClient) {
     }
@@ -56,7 +59,7 @@ export class PlacesService {
     fetchPlaces() {
         return this.http
             .get<{ [key: string]: Place }>(
-                'http://127.0.0.1:8000/video/places/'
+                'http://' + this.serverIp + '/video/places/'
             )
             .pipe(
                 map(resData => {
@@ -89,7 +92,7 @@ export class PlacesService {
     getPlace(id: string) {
         return this.http
             .get<Place>(
-                `http://127.0.0.1:8000/video/places/${id}/`
+               'http://' + this.serverIp + `/video/places/${id}/`
             )
             .pipe(
                 map(placeData => {
@@ -131,7 +134,7 @@ export class PlacesService {
         // };
         return this.http
             .post<Place>(
-                'http://127.0.0.1:8000/video/places/',
+                'http://' + this.serverIp + '/video/places/',
                 {
                     ...newPlace,
                     // id: null
@@ -177,7 +180,7 @@ export class PlacesService {
                     oldPlace.userId
                 );
                 return this.http.put(
-                    `http://127.0.0.1:8000/video/places/${placeId}/`,
+                    'http://' + this.serverIp + `/video/places/${placeId}/`,
                     { ...updatedPlaces[updatedPlaceIndex], id: null }
                 );
             }),
